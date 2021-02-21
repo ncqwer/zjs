@@ -1,6 +1,6 @@
 {
   "name": "@zjs/case-match",
-  "version": "0.0.0",
+  "version": "0.0.1-alpha.0",
   "description": "[experimental] write if-then code using chain mode",
   "keywords": [],
   "author": "“ncqwer” <“18694039767@163.com”>",
