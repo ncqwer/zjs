@@ -20,7 +20,7 @@ function configure(pkg, env, target) {
   const isUmd = target === 'umd';
   const isModule = target === 'module';
   const isCommonJs = target === 'cjs';
-  const realPkgName = pkg.name.replace('@zjs/', '');
+  const realPkgName = pkg.name.replace('@zhujianshi/', '');
   const input = `packages/${realPkgName}/src/index.ts`;
   const deps = []
     .concat(pkg.dependencies ? Object.keys(pkg.dependencies) : [])

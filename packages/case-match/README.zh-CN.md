@@ -17,7 +17,7 @@ yarn add @zjs/case-match
 ## Usage
 
 ```ts
-import {createType,pm} from '@zjs/case-match';
+import {createType,pm} from '@zhujianshi/case-match';
 
 const Author = createType<[number,string]>('author');//authorId,authorName
 const Book = createType<[number,string,typeof Author]>('book');//bookId,bookTitle,author
