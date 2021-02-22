@@ -1,4 +1,4 @@
-# `@zjs/case-match`
+# `@zhujianshi/case-match`
 
 
 
@@ -11,7 +11,7 @@
 ## Install
 
 ```bash
-yarn add @zjs/case-match
+yarn add @zhujianshi/case-match
 ```
 
 ## Usage
@@ -19,8 +19,10 @@ yarn add @zjs/case-match
 ```ts
 import {createType,pm} from '@zhujianshi/case-match';
 
-const Author = createType<[number,string]>('author');//authorId,authorName
-const Book = createType<[number,string,typeof Author]>('book');//bookId,bookTitle,author
+import {createType,pm,base} from '@zhujianshi/case-match';
+
+const Author = createType('author',base.number,base.string);//authorId,authorName
+const Book = createType('book',base.number,base.string,Author);//bookId,bookTitle,author
 
 const adt2Obj = pm
   .case(Author,(authorId,authorName)=>({authorId,authorName}))
