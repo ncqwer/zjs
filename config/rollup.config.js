@@ -10,6 +10,7 @@ import asyncT from 'rollup-plugin-async';
 import { terser } from 'rollup-plugin-terser';
 
 import caseMatch from '../packages/case-match/package.json';
+import lens from '../packages/lens/package.json';
 
 /**
  * Return a Rollup configuration for a `pkg` with `env` and `target`.
@@ -79,6 +80,7 @@ function configure(pkg, env, target) {
     // like React and Slate to use their production variant.
     replace({
       'process.env.NODE_ENV': JSON.stringify(env),
+      preventAssignment: true,
     }),
 
     // Register Node.js builtins for browserify compatibility.
@@ -243,4 +245,5 @@ export default [
   // ...factory(Quote),
   // ...factory(Image),
   ...factory(caseMatch),
+  ...factory(lens),
 ];
