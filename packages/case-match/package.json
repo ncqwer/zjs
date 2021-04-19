@@ -1,6 +1,6 @@
 {
   "name": "@zhujianshi/case-match",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "[experimental] write if-then code using chain mode",
   "keywords": [],
   "author": "“ncqwer” <“18694039767@163.com”>",
