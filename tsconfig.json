@@ -1,4 +1,4 @@
 {
   "files": [],
-  "references": [{"path":"./packages/case-match"}]
+  "references": [{"path":"./packages/case-match"},{"path": "./packages/lens"},{"path":"./packages/use-lens"}]
 }

@@ -3,6 +3,8 @@ import { Identity } from '../type/Identity';
 import { Functor } from '../typeclass/Functor';
 import { fmap } from '../type';
 
+export const id = <S>(x: S) => x;
+
 export type Lens<S, T, A, B> = (
   toFunctor: (x: A) => Functor<B>,
 ) => (x: S) => Functor<T>;

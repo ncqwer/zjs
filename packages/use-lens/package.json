@@ -1,5 +1,5 @@
 {
-  "name": "@zhujianshi/lens",
+  "name": "@zhujianshi/use-lens",
   "version": "0.0.0",
   "description": "Now I’m the model of a modern major general / The venerated Virginian veteran whose men are all / Lining up, to put me up on a pedestal / Writin’ letters to relatives / Embellishin’ my elegance and eloquence / But the elephant is in the room / The truth is in ya face when ya hear the British cannons go / BOOM",
   "keywords": [],
@@ -28,5 +28,18 @@
   "bugs": {
     "url": "https://github.com/ncqwer/zjs/issues"
   },
-  "homepage": "https://github.com/ncqwer/zjs#readme"
+  "homepage": "https://github.com/ncqwer/zjs#readme",
+  "dependencies": {
+    "@zhujianshi/lens": "^1.0.0"
+  },
+  "devDependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-test-renderer": "^17.0.2",
+    "@testing-library/react-hooks": "^5.1.1"
+  },
+  "peerDependencies": {
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0"
+  }
 }

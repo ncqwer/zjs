@@ -11,6 +11,7 @@ import { terser } from 'rollup-plugin-terser';
 
 import caseMatch from '../packages/case-match/package.json';
 import lens from '../packages/lens/package.json';
+import useLens from '../packages/use-lens/package.json';
 
 /**
  * Return a Rollup configuration for a `pkg` with `env` and `target`.
@@ -111,8 +112,8 @@ function configure(pkg, env, target) {
                 },
               },
         ],
-        // '@babel/preset-react',
-      ],
+        /^use-lens$/.test(realPkgName) && '@babel/preset-react',
+      ].filter(Boolean),
       plugins: [
         [
           '@babel/plugin-transform-runtime',
@@ -246,4 +247,5 @@ export default [
   // ...factory(Image),
   ...factory(caseMatch),
   ...factory(lens),
+  ...factory(useLens),
 ];
