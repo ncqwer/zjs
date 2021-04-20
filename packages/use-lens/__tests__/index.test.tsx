@@ -20,7 +20,7 @@ type TestData = {
   };
 };
 
-const { useLens, useLensV } = createShared<TestData>({
+const { useLens, useLensV, SharedProvider } = createShared<TestData>({
   str: 'str',
   num: 1,
   arr: [1],
@@ -74,6 +74,16 @@ describe('useLens', () => {
   test('test with field with no initialValue', () => {
     const { result } = renderHook(() => useLens(['noValue', 'a', 'b']));
     expect(result.current[0]).toBeUndefined();
+  });
+
+  test.only('should work with SharedProvider', () => {
+    const arr = [1, 3, 45, 5];
+    const { result } = renderHook(() => useLens(['arr']), {
+      wrapper: ({ children }) => (
+        <SharedProvider initialValue={{ arr }}>{children}</SharedProvider>
+      ),
+    });
+    expect(result.current[0]).toBe(arr);
   });
 });
 

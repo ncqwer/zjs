@@ -37,7 +37,7 @@ export function createShared<T>(
     useSetLens,
     useSharedStore,
     SharedProvider: ({ children, initialValue, ...options }) => {
-      const store = useSharedStore(initialState, options);
+      const store = useSharedStore(initialValue, options);
       return <Context.Provider value={store}>{children}</Context.Provider>;
     },
     useLensV,
