@@ -85,15 +85,22 @@ export function createShared<T>(
       hasNewFocus = !equalF(currentFocusRef.current, newFocus);
     }
 
-    useEffect(() => {
-      if (hasNewFocus) {
-        currentFocusRef.current = newFocus;
-      }
-      stateRef.current = state;
-      targetLensRef.current = targetLens;
-      equalFRef.current = equalF;
-      hasErrorRef.current = false;
-    });
+    if (hasNewFocus) {
+      currentFocusRef.current = newFocus;
+    }
+    stateRef.current = state;
+    targetLensRef.current = targetLens;
+    equalFRef.current = equalF;
+    hasErrorRef.current = false;
+    // useEffect(() => {
+    //   if (hasNewFocus) {
+    //     currentFocusRef.current = newFocus;
+    //   }
+    //   stateRef.current = state;
+    //   targetLensRef.current = targetLens;
+    //   equalFRef.current = equalF;
+    //   hasErrorRef.current = false;
+    // });
 
     const stateBeforeSubscribe = React.useRef(state);
     useEffect(() => {
@@ -211,6 +218,7 @@ export function createShared<T>(
       const subscriber = (store: Store<State>) => {
         try {
           const nextState = store.getState();
+          if (nextState === stateRef.current) return;
           const nextFocus = view(targetLensRef.current, nextState);
           if (!equalFRef.current(currentFocusRef.current, nextFocus)) {
             stateRef.current = nextState;

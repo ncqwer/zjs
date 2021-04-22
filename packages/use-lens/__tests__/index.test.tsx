@@ -33,7 +33,7 @@ const { useLens, useLensV, SharedProvider } = createShared<TestData>(
     },
   },
   {
-    mode: 'micro',
+    mode: 'instant',
   },
 );
 
