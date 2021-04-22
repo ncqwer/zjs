@@ -13,10 +13,10 @@ export function createShared<T>(
 
   const store = createStore(initialState, options);
   const Context = React.createContext<Store<State>>(store);
-  const useSharedStore = (
+  const useShared = (
     _i: State,
     _o: {
-      mode?: 'marco' | 'micro';
+      mode?: 'macro' | 'micro' | 'instant';
       onStart?: Func;
       onFinish?: Func;
     } = {},
@@ -35,14 +35,16 @@ export function createShared<T>(
   return {
     useLens,
     useSetLens,
-    useSharedStore,
+    useShared,
     SharedProvider: ({ children, initialValue, ...options }) => {
-      const store = useSharedStore(initialValue, options);
+      const store = useShared(initialValue, options);
       return <Context.Provider value={store}>{children}</Context.Provider>;
     },
     useLensV,
+    useStore: () => React.useContext(Context),
   } as SharedApi<T> & {
-    useSharedStore(i: State, _o: StoreOption): Store<State>;
+    useShared(i: State, _o: StoreOption): Store<State>;
+    useStore(): Store<State>;
     SharedProvider: React.FC<{ initialValue: State } & StoreOption>;
   };
 
@@ -80,7 +82,7 @@ export function createShared<T>(
       hasErrorRef.current
     ) {
       newFocus = view(targetLens, state);
-      hasNewFocus = equalF(currentFocusRef.current, newFocus);
+      hasNewFocus = !equalF(currentFocusRef.current, newFocus);
     }
 
     useEffect(() => {

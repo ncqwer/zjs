@@ -1,6 +1,6 @@
 import { Lens, Func, over, set } from '@zhujianshi/lens';
 import { unstable_batchedUpdates } from 'react-dom';
-import { macroTaskSchedule, microTaskSchedule } from './schedule';
+import { createTaskScheduleByMode } from './schedule';
 import { SubscriberDuplicateError, InteralError } from './error';
 
 export type DeepPartial<T> = {
@@ -15,7 +15,7 @@ export type Store<T> = {
 };
 
 export type StoreOption = {
-  mode?: 'marco' | 'micro';
+  mode?: 'macro' | 'micro' | 'instant';
   onStart?: Func;
   onFinish?: Func;
 };
@@ -41,50 +41,32 @@ export const createStore = <T>(
     onStart,
     onFinish,
   }: {
-    mode?: 'marco' | 'micro';
+    mode?: 'macro' | 'micro' | 'instant';
     onStart?: Func;
     onFinish?: Func;
   } = {},
 ) => {
   let currentSchedulePendding: (Promise<void> & { ready: Func }) | null = null;
-  const schedule =
-    mode === 'micro'
-      ? microTaskSchedule({
-          onStart() {
-            if (onStart) onStart();
-            if (currentSchedulePendding) currentSchedulePendding.ready();
-            let f = null;
-            currentSchedulePendding = new Promise((res) => {
-              f = res;
-            }) as any;
-            (currentSchedulePendding as any).ready = f;
-          },
-          onFinish() {
-            if (onFinish) onFinish();
-            if (currentSchedulePendding) {
-              currentSchedulePendding.ready();
-              currentSchedulePendding = null;
-            }
-          },
-        })
-      : macroTaskSchedule({
-          onStart() {
-            if (onStart) onStart();
-            if (currentSchedulePendding) currentSchedulePendding.ready();
-            let f = null;
-            currentSchedulePendding = new Promise((res) => {
-              f = res;
-            }) as any;
-            (currentSchedulePendding as any).ready = f;
-          },
-          onFinish() {
-            if (onFinish) onFinish();
-            if (currentSchedulePendding) {
-              currentSchedulePendding.ready();
-              currentSchedulePendding = null;
-            }
-          },
-        });
+  const schedule = createTaskScheduleByMode(mode)({
+    wrapper: unstable_batchedUpdates,
+    onStart() {
+      if (onStart) onStart();
+      if (currentSchedulePendding) currentSchedulePendding.ready();
+      let f = null;
+      currentSchedulePendding = new Promise((res) => {
+        f = res;
+      }) as any;
+      (currentSchedulePendding as any).ready = f;
+    },
+    onFinish() {
+      if (onFinish) onFinish();
+      if (currentSchedulePendding) {
+        currentSchedulePendding.ready();
+        currentSchedulePendding = null;
+      }
+    },
+  });
+
   type State = DeepPartial<T>;
   let state = initialState;
   let entities: Subscriber<State>[] = [];
@@ -97,10 +79,8 @@ export const createStore = <T>(
   return store;
 
   function onFlush() {
-    unstable_batchedUpdates(() => {
-      entities.reverse().forEach(({ onChange }) => {
-        onChange(store);
-      });
+    entities.reverse().forEach(({ onChange }) => {
+      onChange(store);
     });
   }
 
@@ -131,7 +111,7 @@ export const createStore = <T>(
       targetLens,
       value: initialValue,
     });
-    if (!currentSchedulePendding) throw InteralError();
-    throw currentSchedulePendding;
+    if (!currentSchedulePendding && mode !== 'instant') throw InteralError();
+    throw currentSchedulePendding || Promise.resolve();
   }
 };

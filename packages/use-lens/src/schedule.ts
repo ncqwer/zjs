@@ -1,19 +1,25 @@
 import { lens, Func } from '@zhujianshi/lens';
+import { UnsupportedConfigError } from './error';
+
+const noEffectWrapper = (f: Func) => f();
 
 export const createSchedule = (createFlush: Func<Func>) => ({
   onStart,
   onFinish,
-}: { onStart?: Func; onFinish?: Func } = {}) => {
+  wrapper = noEffectWrapper,
+}: { onStart?: Func; onFinish?: Func; wrapper?: (f: Func) => void } = {}) => {
   const tasks: Func[] = [];
   const cb = () => {
-    tasks.splice(0, tasks.length).forEach((task) => task());
+    noEffectWrapper(() =>
+      tasks.splice(0, tasks.length).forEach((task) => task()),
+    );
     if (onFinish) onFinish();
   };
   const postMessage = createFlush(cb);
   return (task: Func) => {
     if (tasks.push(task) === 1) {
-      postMessage();
       if (onStart) onStart();
+      postMessage();
     }
   };
 };
@@ -30,3 +36,14 @@ export const macroTaskSchedule = createSchedule((cb: Func) => {
 export const microTaskSchedule = createSchedule((cb: Func) => () =>
   Promise.resolve().then(cb),
 );
+
+export const instantTaskSchedule = createSchedule((cb: Func) => cb);
+
+export const createTaskScheduleByMode = (
+  mode: 'macro' | 'micro' | 'instant',
+) => {
+  if (mode === 'micro') return microTaskSchedule;
+  if (mode === 'macro') return macroTaskSchedule;
+  if (mode === 'instant') return instantTaskSchedule;
+  throw UnsupportedConfigError('mode');
+};

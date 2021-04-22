@@ -20,17 +20,22 @@ type TestData = {
   };
 };
 
-const { useLens, useLensV, SharedProvider } = createShared<TestData>({
-  str: 'str',
-  num: 1,
-  arr: [1],
-  obj: {
-    a: {
-      str: 'childstr',
-      num: 2,
+const { useLens, useLensV, SharedProvider } = createShared<TestData>(
+  {
+    str: 'str',
+    num: 1,
+    arr: [1],
+    obj: {
+      a: {
+        str: 'childstr',
+        num: 2,
+      },
     },
   },
-});
+  {
+    mode: 'micro',
+  },
+);
 
 describe('useLens', () => {
   test('should work with string type', async () => {
@@ -38,7 +43,7 @@ describe('useLens', () => {
     expect(result.current[0]).toBe('str');
     await act(() => {
       result.current[1]('hello world');
-      return Promise.resolve();
+      return new Promise((res) => setTimeout(res)) as any;
     });
     expect(result.current[0]).toBe('hello world');
   });
@@ -48,7 +53,7 @@ describe('useLens', () => {
 
     await act(() => {
       result.current[1](2);
-      return Promise.resolve();
+      return new Promise((res) => setTimeout(res)) as any;
     });
     expect(result.current[0]).toBe(2);
   });
@@ -63,7 +68,7 @@ describe('useLens', () => {
         str: 'hello',
         num: 10,
       });
-      return Promise.resolve();
+      return new Promise((res) => setTimeout(res)) as any;
     });
     expect(result.current[0]).toStrictEqual({
       str: 'hello',
@@ -76,7 +81,7 @@ describe('useLens', () => {
     expect(result.current[0]).toBeUndefined();
   });
 
-  test.only('should work with SharedProvider', () => {
+  test('should work with SharedProvider', () => {
     const arr = [1, 3, 45, 5];
     const { result } = renderHook(() => useLens(['arr']), {
       wrapper: ({ children }) => (
@@ -89,10 +94,12 @@ describe('useLens', () => {
 
 describe('useLensV', () => {
   test('should work with simple type', async () => {
-    const { result, waitForNextUpdate } = renderHook(() =>
+    const { result, waitFor, waitForNextUpdate } = renderHook(() =>
       useLensV(['noValue', 'a', 'b'], 1),
     );
-    await waitForNextUpdate();
+
+    await waitFor(() => !!result.current[0]);
+    // await waitForNextUpdate();
     expect(result.current[0]).toBe(1);
   });
 });
