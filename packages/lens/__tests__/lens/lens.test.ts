@@ -22,7 +22,7 @@ describe('lens test', () => {
         },
       },
     };
-    const setter = <S, T>(s: SourceType<S>, nValue: T): SourceType<T> => ({
+    const setter = <S, T>(nValue: T, s: SourceType<S>): SourceType<T> => ({
       ...s,
       a: {
         ...s?.a,

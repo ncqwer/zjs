@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/ncqwer/zjs#readme",
   "dependencies": {
-    "@zhujianshi/lens": "^1.0.0"
+    "@zhujianshi/lens": "^0.0.1"
   },
   "devDependencies": {
     "@testing-library/react-hooks": "^5.1.1",

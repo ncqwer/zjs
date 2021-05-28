@@ -27,10 +27,10 @@ export type Lens_<S, A> = Lens<S, S, A, A>;
 
 export const lens = <S, T, A, B>(
   get: (x: any) => A,
-  set: (source: S, x: B) => T,
+  set: (x: B, source: S) => T,
 ): Lens<S, T, A, B> => {
   return (toFunctor: (x: A) => Functor<B>) => (source: S) =>
-    fmap((focus: B) => set(source, focus), toFunctor(get(source)));
+    fmap((focus: B) => set(focus, source), toFunctor(get(source)));
 };
 
 // type ans = Lens<any, any> extends Setting<any, any, any, any> ? true : false;

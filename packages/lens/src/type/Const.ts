@@ -27,8 +27,8 @@ export default {
   impl: {
     is: (_: any, functor: any) => functor?.__type === 'Const',
     Functor: {
-      fmap<T, S>(_f: (x: S) => T, functor: Const<any, S>): Const<any, S> {
-        return functor;
+      fmap<T, S>(_f: (x: S) => T, functor: Const<S, any>): Const<T, any> {
+        return functor as any;
       },
     },
   },
