@@ -9,9 +9,11 @@ export type DeepPartial<T> = {
 
 export type Store<T> = {
   getState: () => T;
+  _setState: (v: T) => void;
+  _setCallback: (f?: (v: T) => void) => void;
   dispatch: (action: Action<T>) => void;
   register: (subscriber: Subscriber<T>) => () => void;
-  resetInitialValue: (init: InitialValueSlice<T>) => never;
+  resetInitialValue: (init: InitialValueSlice<T>, callback?: Func) => never;
 };
 
 export type StoreOption = {
@@ -40,38 +42,44 @@ export const createStore = <T>(
     mode = 'micro',
     onStart,
     onFinish,
+    callback: cb,
   }: {
     mode?: 'macro' | 'micro' | 'instant';
     onStart?: Func;
     onFinish?: Func;
+    callback?: (v: DeepPartial<T>) => void;
   } = {},
 ) => {
-  let currentSchedulePendding: (Promise<void> & { ready: Func }) | null = null;
+  // let currentSchedulePendding: (Promise<void> & { ready: Func }) | null = null;
   const schedule = createTaskScheduleByMode(mode)({
     wrapper: unstable_batchedUpdates,
     onStart() {
       if (onStart) onStart();
-      if (currentSchedulePendding) currentSchedulePendding.ready();
-      let f = null;
-      currentSchedulePendding = new Promise((res) => {
-        f = res;
-      }) as any;
-      (currentSchedulePendding as any).ready = f;
+      // if (currentSchedulePendding) currentSchedulePendding.ready();
+      // let f = null;
+      // currentSchedulePendding = new Promise((res) => {
+      //   f = res;
+      // }) as any;
+      // (currentSchedulePendding as any).ready = f;
     },
     onFinish() {
       if (onFinish) onFinish();
-      if (currentSchedulePendding) {
-        currentSchedulePendding.ready();
-        currentSchedulePendding = null;
-      }
+      callback && callback(state);
+      // if (currentSchedulePendding) {
+      //   currentSchedulePendding.ready();
+      //   currentSchedulePendding = null;
+      // }
     },
   });
 
   type State = DeepPartial<T>;
   let state = initialState;
   let entities: Subscriber<State>[] = [];
+  let callback = cb;
   const store: Store<State> = {
     getState: () => state,
+    _setState: (v: State) => (state = v),
+    _setCallback: (f?: (v: DeepPartial<T>) => void) => (callback = f),
     dispatch,
     register,
     resetInitialValue,
@@ -103,15 +111,17 @@ export const createStore = <T>(
     };
   }
 
-  function resetInitialValue({
-    targetLens,
-    initialValue,
-  }: InitialValueSlice<State>): never {
-    dispatch({
-      targetLens,
-      value: initialValue,
+  function resetInitialValue(
+    { targetLens, initialValue }: InitialValueSlice<State>,
+    refreshRoot?: Func,
+  ): never {
+    if (typeof initialValue === 'function') {
+      state = over(targetLens, initialValue, state);
+    } else {
+      state = set(targetLens, initialValue, state);
+    } // 这里不去trigger关联的组件更新，使用
+    throw Promise.resolve().then(() => {
+      refreshRoot && refreshRoot();
     });
-    if (!currentSchedulePendding && mode !== 'instant') throw InteralError();
-    throw currentSchedulePendding || Promise.resolve();
   }
 };

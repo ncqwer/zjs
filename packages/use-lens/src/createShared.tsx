@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
-import { Func, view, lensPath } from '@zhujianshi/lens';
+import { Func, view, lensPath, Lens_ } from '@zhujianshi/lens';
 
 import { createStore, DeepPartial, Store, StoreOption } from './store';
 // import { lensPath } from 'ramda';
 import { SharedApi } from './shareApi';
+import { ChangeBridgeContext } from './ChangeBridge';
+import { lens } from 'ramda';
 
 export function createShared<T>(
   initialState: DeepPartial<T>,
@@ -19,9 +21,12 @@ export function createShared<T>(
       mode?: 'macro' | 'micro' | 'instant';
       onStart?: Func;
       onFinish?: Func;
+      callback?: (v: State) => void;
     } = {},
+    _s?: Store<State>,
   ) => {
     const storeRef = React.useRef<Store<State> | null>(null);
+    if (_s) storeRef.current = _s;
     if (storeRef.current) {
       return storeRef.current;
     }
@@ -36,8 +41,23 @@ export function createShared<T>(
     useLens,
     useSetLens,
     useShared,
-    SharedProvider: ({ children, initialValue, ...options }) => {
-      const store = useShared(initialValue, options);
+    storeLens: lens(
+      (x) => x,
+      (x) => x,
+    ),
+    SharedProvider: ({
+      children,
+      initialValue,
+      value,
+      onChange,
+      store: _s,
+      ...options
+    }) => {
+      const store = useShared(value || initialValue, options, _s);
+      if (value && store.getState() !== value) {
+        store._setState(value);
+      }
+      store._setCallback(onChange);
       return <Context.Provider value={store}>{children}</Context.Provider>;
     },
     useLensV,
@@ -45,13 +65,22 @@ export function createShared<T>(
   } as SharedApi<T> & {
     useShared(i: State, _o: StoreOption): Store<State>;
     useStore(): Store<State>;
-    SharedProvider: React.FC<{ initialValue: State } & StoreOption>;
+    storeLens: Lens_<State, State>;
+    SharedProvider: React.FC<
+      {
+        initialValue: State;
+        value?: State;
+        onChange?: (v: State) => void;
+        store?: Store<State>;
+      } & StoreOption
+    >;
   };
 
   function useLens(
     lens: any,
     equalF: (lhs: any, rhs: any) => boolean = simpleEqual,
   ) {
+    const changeBridgeUpdate = React.useContext(ChangeBridgeContext);
     const [, forceUpdate] = React.useReducer((c) => c + 1, 0) as [
       never,
       () => void,
@@ -111,7 +140,7 @@ export function createShared<T>(
           if (!equalFRef.current(currentFocusRef.current, nextFocus)) {
             stateRef.current = nextState;
             currentFocusRef.current = nextFocus;
-            forceUpdate();
+            changeBridgeUpdate ? changeBridgeUpdate() : forceUpdate();
           }
         } catch (error) {
           hasErrorRef.current = true;
@@ -122,7 +151,7 @@ export function createShared<T>(
       const unsubscribe = store.register({ onChange: subscriber });
       if (store.getState() !== stateBeforeSubscribe.current) subscriber(store);
       return unsubscribe;
-    }, [store]);
+    }, [store, changeBridgeUpdate]);
 
     return [
       hasNewFocus ? newFocus : currentFocusRef.current,
@@ -161,6 +190,12 @@ export function createShared<T>(
     initialValue: any,
     equalF: (lhs: any, rhs: any) => boolean = simpleEqual,
   ) {
+    const changeBridgeUpdate = React.useContext(ChangeBridgeContext);
+    if (!changeBridgeUpdate) {
+      console.warn(
+        "It's recommended to use [useLensV] with ChangeBridge, can't find any [ChangeBridge] above.",
+      );
+    }
     const [, forceUpdate] = React.useReducer((c) => c + 1, 0) as [
       never,
       () => void,
@@ -184,10 +219,13 @@ export function createShared<T>(
     }
     if (!isMountedRef.current && currentFocusRef.current === undefined) {
       isMountedRef.current = true;
-      store.resetInitialValue({
-        targetLens,
-        initialValue,
-      }); // There will throw the promise to terminate this render process
+      store.resetInitialValue(
+        {
+          targetLens,
+          initialValue,
+        },
+        changeBridgeUpdate,
+      ); // There will throw the promise to terminate this render process
       // to help make both the parent and child foucs the same version store.
     }
 
@@ -223,7 +261,7 @@ export function createShared<T>(
           if (!equalFRef.current(currentFocusRef.current, nextFocus)) {
             stateRef.current = nextState;
             currentFocusRef.current = nextFocus;
-            forceUpdate();
+            changeBridgeUpdate ? changeBridgeUpdate() : forceUpdate();
           }
         } catch (error) {
           hasErrorRef.current = true;
