@@ -32,12 +32,11 @@ export const foldr = (f: any, zero: any, s: any) => {
     return Array.from(s[Symbol.iterator]()).reduceRight(f, zero);
   throw new Error(`${s} is not a instance of [Foldable]`);
 };
-
-export type Func<A, B> = (v: A) => B;
+type Func<A = any, B = any> = (v: A) => B;
 
 export type Const<A, B = any> = Functor<B>;
 
-const Const = <A, B = any>(v: A): Const<A, B> => {
+export const Const = <A, B = any>(v: A): Const<A, B> => {
   const getConst = () => v;
   getConst['fantasy-land/map'] = <S>(f: (v: B) => S) =>
     (getConst as any) as Const<A, S>;
@@ -70,7 +69,7 @@ export const to = <S, A>(f: Func<S, A>): Getting<A, S, A> => (toFunctor) => (
   return Const(getConst(tmp(source)));
 };
 
-type Indentity<T> = Functor<T>;
+export type Indentity<T> = Functor<T>;
 
 export const Indentity = <T>(v: T): Indentity<T> => {
   const getIndentity = () => v;
@@ -109,7 +108,7 @@ export const sets = <S, T, A, B>(
   ) as any;
 };
 
-const foldMapOf = <R, S, A>(l: Getting<R, S, A>) => (f: Func<A, R>) => {
+export const foldMapOf = <R, S, A>(l: Getting<R, S, A>) => (f: Func<A, R>) => {
   return compose(
     (v: Const<R, S>) => getConst(v),
     (s: S) => l(compose((v: R) => Const(v), f))(s),
@@ -128,14 +127,14 @@ export const Endo = <T>(f: Func<T, T>): Endo<T> => {
 
 const appEndo = <T>(e: Endo<T>): Func<T, T> => (e as any)();
 
-const foldrOf = <R, S, A>(l: Getting<Endo<R>, S, A>) => (
+export const foldrOf = <R, S, A>(l: Getting<Endo<R>, S, A>) => (
   f: Func<A, Func<R, R>>,
 ) => (z: R) =>
   compose((endo: Endo<R>) => appEndo(endo)(z), foldMapOf(l)(compose(Endo, f)));
 
 export const id = <T>(v: T) => v;
 
-const foldring = <S, A, R = any>(
+export const foldring = <S, A, R = any>(
   fr: (
     reduceRight: (acc: Const<R, A>, current: A) => Const<R, A>,
     zero: Const<R, A>,

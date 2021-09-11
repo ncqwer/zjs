@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import { Func, view, lensPath, Lens_ } from '@zhujianshi/lens';
+import { view, lensPath, Lens_ } from '@zhujianshi/lens';
 
 import { createStore, DeepPartial, Store, StoreOption } from './store';
 // import { lensPath } from 'ramda';
 import { SharedApi } from './shareApi';
 import { ChangeBridgeContext } from './ChangeBridge';
 import { lens } from 'ramda';
+import { Func } from './error';
 
 export function createShared<T>(
   initialState: DeepPartial<T>,

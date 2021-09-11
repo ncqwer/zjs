@@ -1,5 +1,4 @@
-import { fmap } from '../type';
-import { Lens_, id } from './lens';
+import { Lens_, id, fmap } from './lens';
 
 export function lensPath<
   S,
@@ -60,5 +59,5 @@ export function lensPath(path: any[]) {
     [id, id],
   );
   return (toFunctor: any) => (source: any) =>
-    fmap((focus) => setter(focus, source), toFunctor(getter(source)));
+    fmap((focus: any) => setter(focus, source), toFunctor(getter(source)));
 }

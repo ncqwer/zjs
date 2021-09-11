@@ -1,5 +1,5 @@
-import { lens, Func } from '@zhujianshi/lens';
-import { UnsupportedConfigError } from './error';
+import { lens } from '@zhujianshi/lens';
+import { UnsupportedConfigError, Func } from './error';
 
 const noEffectWrapper = (f: Func) => f();
 
