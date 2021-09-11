@@ -1,5 +1,4 @@
 import { lens, view, set } from '../../src/lens/lens';
-import { Functor } from '../../src/typeclass/Functor';
 import * as R from 'ramda';
 
 describe('lens test', () => {
