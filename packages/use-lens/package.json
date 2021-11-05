@@ -1,8 +1,11 @@
 {
   "name": "@zhujianshi/use-lens",
   "version": "0.0.7",
-  "description": "Now I’m the model of a modern major general / The venerated Virginian veteran whose men are all / Lining up, to put me up on a pedestal / Writin’ letters to relatives / Embellishin’ my elegance and eloquence / But the elephant is in the room / The truth is in ya face when ya hear the British cannons go / BOOM",
-  "keywords": [],
+  "description": "a small react state manager with amazing lens",
+  "keywords": [
+    "lens",
+    "react"
+  ],
   "author": "“ncqwer” <“18694039767@163.com”>",
   "license": "MIT",
   "main": "dist/index.js",

@@ -12,6 +12,7 @@ import { terser } from 'rollup-plugin-terser';
 import caseMatch from '../packages/case-match/package.json';
 import lens from '../packages/lens/package.json';
 import useLens from '../packages/use-lens/package.json';
+import fe from '../packages/fe/package.json';
 
 /**
  * Return a Rollup configuration for a `pkg` with `env` and `target`.
@@ -248,4 +249,5 @@ export default [
   ...factory(caseMatch),
   ...factory(lens),
   ...factory(useLens),
+  ...factory(fe),
 ];

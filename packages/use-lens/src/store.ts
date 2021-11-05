@@ -1,7 +1,9 @@
-import { Lens, Func, over, set } from '@zhujianshi/lens';
+import { Lens, over, set } from '@zhujianshi/lens';
 import { unstable_batchedUpdates } from 'react-dom';
 import { createTaskScheduleByMode } from './schedule';
 import { SubscriberDuplicateError, InteralError } from './error';
+
+type Func<A = void, B extends any[] = []> = (...args: B) => A;
 
 export type DeepPartial<T> = {
   [k in keyof T]?: DeepPartial<T[k]>;
