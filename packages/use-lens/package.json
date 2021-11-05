@@ -1,6 +1,6 @@
 {
   "name": "@zhujianshi/use-lens",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "a small react state manager with amazing lens",
   "keywords": [
     "lens",
@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/ncqwer/zjs#readme",
   "dependencies": {
-    "@zhujianshi/lens": "^0.0.4"
+    "@zhujianshi/lens": "^0.0.5"
   },
   "devDependencies": {
     "@testing-library/react-hooks": "^5.1.1",
