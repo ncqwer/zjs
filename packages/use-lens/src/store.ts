@@ -1,5 +1,4 @@
 import { Lens, over, set } from '@zhujianshi/lens';
-import { unstable_batchedUpdates } from 'react-dom';
 import { createTaskScheduleByMode } from './schedule';
 import { SubscriberDuplicateError, InteralError } from './error';
 
@@ -45,16 +44,18 @@ export const createStore = <T>(
     onStart,
     onFinish,
     callback: cb,
+    wrapper,
   }: {
     mode?: 'macro' | 'micro' | 'instant';
     onStart?: Func;
     onFinish?: Func;
     callback?: (v: DeepPartial<T>) => void;
+    wrapper?: (f: Func) => void;
   } = {},
 ) => {
   // let currentSchedulePendding: (Promise<void> & { ready: Func }) | null = null;
   const schedule = createTaskScheduleByMode(mode)({
-    wrapper: unstable_batchedUpdates,
+    wrapper,
     onStart() {
       if (onStart) onStart();
       // if (currentSchedulePendding) currentSchedulePendding.ready();

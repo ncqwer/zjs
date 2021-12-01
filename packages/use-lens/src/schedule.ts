@@ -10,9 +10,7 @@ export const createSchedule = (createFlush: Func<Func>) => ({
 }: { onStart?: Func; onFinish?: Func; wrapper?: (f: Func) => void } = {}) => {
   const tasks: Func[] = [];
   const cb = () => {
-    noEffectWrapper(() =>
-      tasks.splice(0, tasks.length).forEach((task) => task()),
-    );
+    wrapper(() => tasks.splice(0, tasks.length).forEach((task) => task()));
     if (onFinish) onFinish();
   };
   const postMessage = createFlush(cb);
