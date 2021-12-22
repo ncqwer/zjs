@@ -1,6 +1,6 @@
 {
   "name": "@zhujianshi/use-lens",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "a small react state manager with amazing lens",
   "keywords": [
     "lens",
