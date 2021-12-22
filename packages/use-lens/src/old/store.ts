@@ -4,9 +4,15 @@ import { SubscriberDuplicateError, InteralError } from './error';
 
 type Func<A = void, B extends any[] = []> = (...args: B) => A;
 
-export type DeepPartial<T> = {
-  [k in keyof T]?: DeepPartial<T[k]>;
-};
+export type DeepPartial<T> = T extends number
+  ? number
+  : T extends string
+  ? string
+  : T extends any[]
+  ? T
+  : {
+      [k in keyof T]?: DeepPartial<T[k]>;
+    };
 
 export type Store<T> = {
   getState: () => T;

@@ -31,10 +31,10 @@ export function createShared<T>(
     if (storeRef.current) {
       return storeRef.current;
     }
-    storeRef.current = createStore(
-      { ...initialState, ..._i },
-      { ...options, ..._o },
-    );
+    storeRef.current = createStore(Object.assign({}, initialState, _i), {
+      ...options,
+      ..._o,
+    });
     return storeRef.current;
   };
 
