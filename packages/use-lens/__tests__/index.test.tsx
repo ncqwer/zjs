@@ -1,5 +1,5 @@
 import React from 'react';
-import { createShared, startTransition } from '../src/index';
+import { createShared, microBundled, macroBundled } from '../src/index';
 import { renderHook, act } from '@testing-library/react-hooks';
 import { to } from '@zhujianshi/lens';
 
@@ -57,7 +57,9 @@ describe('useLens', () => {
   });
 
   test('should work with string type', async () => {
-    const { result } = renderHook(() => useLens(['str']));
+    const { result } = renderHook(() => {
+      return useLens(['str']);
+    });
     expect(result.current[0]).toBe('str');
     await act(() => {
       result.current[1]('hello world');
@@ -129,22 +131,25 @@ describe('useLens', () => {
     expect(setHandler).toBeCalledTimes(2);
   });
 
-  test('should bundled the updater with startTransition', async () => {
+  test('should work intentionly in react18', async () => {
     setHandler = jest.fn((x) => x);
-    const { result } = renderHook(() => useLens(['num']));
-
+    const fn = jest.fn();
+    const { result } = renderHook(() => {
+      fn();
+      return useLens(['num']);
+    });
+    expect(fn).toBeCalledTimes(1);
     await act(() => {
-      startTransition(() => {
-        result.current[1](3);
-        result.current[1](4);
-      });
+      result.current[1](3);
+      result.current[1](4);
       return new Promise((res) => setTimeout(res)) as any;
     });
     expect(result.current[0]).toBe(4);
-    expect(setHandler).toBeCalledTimes(1);
+    expect(fn).toBeCalledTimes(2);
+    expect(setHandler).toBeCalledTimes(2);
   });
 
-  test('should behave intensionly in react-v18', async () => {
+  test('should work with microBundled', async () => {
     setHandler = jest.fn((x) => x);
     const fn = jest.fn();
     const { result } = renderHook(() => {
@@ -154,9 +159,15 @@ describe('useLens', () => {
       return [
         num,
         () => {
-          forceUpdate({});
-          setNum(3);
-          setNum(4);
+          microBundled(
+            () => {
+              setNum(3);
+              setNum(4);
+            },
+            () => {
+              forceUpdate({});
+            },
+          );
         },
       ] as const;
     });
@@ -170,30 +181,42 @@ describe('useLens', () => {
     expect(fn).toBeCalledTimes(2);
   });
 
-  test('should integrated with startTransition in react-v18', async () => {
+  test.only('should work with macroBundled', async () => {
     setHandler = jest.fn((x, message) => {
-      console.log(message);
       return x;
     });
-    const fn = jest.fn();
+    const fn = jest.fn(() => {
+      // const now = performance.now();
+      // while (performance.now() - now < 1000) {}
+    }); //
     const { result } = renderHook(() => {
       const [num, setNum] = useLens(['num']);
-      const setArr = useSetting(['arr']);
+      const [, setArr] = useLens(['arr']);
       const [, forceUpdate] = React.useState({});
       fn();
       return [
         num,
         () => {
-          startTransition(() => {
+          // setNum(5);
+          // setArr([]);
+          // setArr([1]);
+          // forceUpdate({});
+          Promise.resolve().then(() => {
+            setNum(5);
+            setArr([]);
+            setArr([1]);
             forceUpdate({});
-            Promise.resolve().then(() => {
-              startTransition(() => {
-                setNum(4);
-                setArr([]);
-                setArr([]);
-              });
-            });
           });
+          // microBundled(
+          //   () => {
+          //     setNum(5);
+          //     // setArr([]);
+          //     setArr([1]);
+          //   },
+          //   // () => {
+          //   //   forceUpdate({});
+          //   // },
+          // );
         },
       ] as const;
     });
@@ -202,8 +225,8 @@ describe('useLens', () => {
       result.current[1]();
       return new Promise((res) => setTimeout(res)) as any;
     });
-    expect(result.current[0]).toBe(4);
-    expect(setHandler).toBeCalledTimes(1);
+    // expect(result.current[0]).toBe(5);
+    // expect(setHandler).toBeCalledTimes(3);
     expect(fn).toBeCalledTimes(2);
   });
 });

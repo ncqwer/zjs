@@ -1,4 +1,4 @@
-import { isTransition, startTransition } from './startTranstion';
+import { getScheduler } from './schedule';
 
 export type MiddlewareImpl<State> = (
   store: Store<State>,
@@ -11,7 +11,7 @@ export type MiddlewareImpl<State> = (
 };
 
 export type Store<State> = {
-  subscribe: (f: (state: State) => void) => () => void;
+  subscribe: (f: () => void) => () => void;
   dispatchAction: (f: (old: State) => State, message?: string) => void;
   getState: () => State;
   setState: (newState: State, message?: string) => void;
@@ -22,12 +22,11 @@ export const createStore = <State>(
   middleware: MiddlewareImpl<State>,
   initialState: State,
 ): Store<State> => {
-  type Listener = (state: State) => void;
+  type Listener = () => void;
   type Callback = (old: State) => State;
-  type Updater = { callback: Callback; message: string };
 
   const listeners = new Set<Listener>();
-  const bundledUpdaters: Updater[] = [];
+  let internalState: State | null = null;
   let getStateHander: () => State = null as any;
   let setStateHandler: (
     newState: State,
@@ -40,6 +39,7 @@ export const createStore = <State>(
     getState,
     setState,
     __bind: (get: () => State, set: (newState: State) => void) => {
+      internalState = null;
       getStateHander = get;
       setStateHandler = set;
     },
@@ -53,43 +53,50 @@ export const createStore = <State>(
   }
 
   function dispatchAction(callback: Callback, message = 'anonymous') {
-    if (!isTransition()) {
-      performSyncUpdate([{ callback, message }]);
-    } else {
-      if (bundledUpdaters.push({ callback, message }) === 1)
-        Promise.resolve().then(() =>
-          startTransition(() => performSyncUpdate(bundledUpdaters.splice(0))),
-        );
-    }
-  }
-
-  function performSyncUpdate(updaters: Updater[]) {
     const prevState = getState();
-    const { state: newState, message } = updaters.reduce(
-      ({ state, message: prevMessage }, { callback, message }) => ({
-        message: prevMessage ? `${prevMessage}|${message}` : message,
-        state: callback(state),
-      }),
-      {
-        state: prevState,
-        message: '',
-      },
-    );
+    const newState = callback(prevState);
 
-    if (newState === prevState) return;
+    if (newState === prevState) {
+      console.log(
+        '%c [ newState ]-60',
+        'font-size:13px; background:pink; color:#bf2c9f;',
+        newState,
+        prevState,
+      );
+      return;
+    }
+
+    internalState = newState;
     setState(newState, message);
+
+    // if (!isTransition()) {
+    // } else {
+    //   if (bundledUpdaters.push({ callback, message }) === 1)
+    //     Promise.resolve().then(() =>
+    //       startTransition(() => performSyncUpdate(bundledUpdaters.splice(0))),
+    //     );
+    // }
   }
 
   function setState(newState: State, message?: string) {
     if (setStateHandler) {
       set((v) => setStateHandler(v))(newState, message);
-      Array.from(listeners).forEach((listener) => {
-        listener(newState);
-      });
+      scheduleUpdate();
     }
   }
 
+  function scheduleUpdate() {
+    getScheduler()(() => {
+      Array.from(listeners).forEach((listener) => {
+        listener();
+      });
+    });
+  }
+
   function getState() {
-    return get(getStateHander)();
+    return get(() => {
+      const h = internalState || getStateHander();
+      return h;
+    })();
   }
 };

@@ -47,9 +47,11 @@ export function lensPath(path: any[]) {
     (acc, k) => [
       (x: any) => acc[0](x)?.[k],
       (value: any, source: any) => {
+        const current = acc[0](source);
+        if (current[k] === value) return source;
         return acc[1](
           {
-            ...acc[0](source),
+            ...current,
             [k]: value,
           },
           source,

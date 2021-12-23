@@ -16,4 +16,4 @@ export type { Middleware } from './react18/';
 
 export { createShared, createShared__old };
 
-export { startTransition } from './react18/startTranstion';
+export { microBundled, macroBundled } from './react18/schedule';
