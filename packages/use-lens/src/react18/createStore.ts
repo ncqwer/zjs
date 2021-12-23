@@ -28,10 +28,8 @@ export const createStore = <State>(
   const listeners = new Set<Listener>();
   let internalState: State | null = null;
   let getStateHander: () => State = null as any;
-  let setStateHandler: (
-    newState: State,
-    message?: string,
-  ) => void = null as any;
+  let setStateHandler: (newState: State, message?: string) => void =
+    null as any;
 
   const store = {
     subscribe,
@@ -57,12 +55,6 @@ export const createStore = <State>(
     const newState = callback(prevState);
 
     if (newState === prevState) {
-      console.log(
-        '%c [ newState ]-60',
-        'font-size:13px; background:pink; color:#bf2c9f;',
-        newState,
-        prevState,
-      );
       return;
     }
 

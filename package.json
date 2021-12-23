@@ -33,7 +33,6 @@
     "chokidar": "^3.4.2",
     "core-js": "3",
     "cross-env": "^7.0.2",
-    "docz": "^2.3.1",
     "eslint": "^7.2.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-import": "^2.21.1",
@@ -44,7 +43,7 @@
     "ramda": "^0.27.1",
     "react": "^18.0.0-rc.0",
     "react-dom": "^18.0.0-rc.0",
-    "react-test-renderer": "^18.0.0-rc.0",
+    "react-test-renderer": "^18.0.0-beta-24dd07bd2-20211208",
     "rollup": "^2.15.0",
     "rollup-plugin-async": "^1.2.0",
     "rollup-plugin-terser": "^6.1.0",
@@ -59,7 +58,6 @@
     "build": "rollup --config ./config/rollup.config.js",
     "build:watch": "rollup --watch --config ./config/rollup.config.js",
     "build:release": "cross-env NODE_ENV=production yarn build",
-    "dev": "yarn docz dev",
     "pkgcreate": "node scripts/create.js",
     "test": "node scripts/test.js"
   }

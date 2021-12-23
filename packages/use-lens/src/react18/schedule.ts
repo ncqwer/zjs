@@ -33,12 +33,12 @@ export const getMacroTaskSchedule = (f: Func) =>
   });
 
 export const getMicroTaskSchedule = (f: Func) =>
-  createSchedule((cb: Func) => () =>
-    Promise.resolve().then(() => {
-      console.log('hhh');
-      f();
-      cb();
-    }),
+  createSchedule(
+    (cb: Func) => () =>
+      Promise.resolve().then(() => {
+        f();
+        cb();
+      }),
   );
 
 const noEffect = () => {};
