@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`radar-echo-utils test [createMosaic] should work right 1`] = `"b6b658e09791fd76ade751de95d8aeed"`;

@@ -9,6 +9,7 @@ lib/
 node_modules/
 packages/*/yarn.lock
 packages/*/dist
+packages/*/__tests__/fixtures/*
 site/out/
 tmp/
 

@@ -13,6 +13,7 @@ import caseMatch from '../packages/case-match/package.json';
 import lens from '../packages/lens/package.json';
 import useLens from '../packages/use-lens/package.json';
 import fe from '../packages/fe/package.json';
+import radar from '../packages/radar-echo-utils/package.json';
 
 /**
  * Return a Rollup configuration for a `pkg` with `env` and `target`.
@@ -246,8 +247,9 @@ export default [
   // ...factory(List),
   // ...factory(Quote),
   // ...factory(Image),
-  ...factory(caseMatch),
-  ...factory(lens),
-  ...factory(useLens),
-  ...factory(fe),
+  // ...factory(caseMatch),
+  // ...factory(lens),
+  // ...factory(useLens),
+  // ...factory(fe),
+  ...factory(radar),
 ];
