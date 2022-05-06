@@ -238,18 +238,9 @@ export function factory(pkg, options = {}) {
  */
 
 export default [
-  // ...factory(Core),
-  // ...factory(Core),
-  // ...factory(Code),
-  // ...factory(Paragraph),
-  // ...factory(Formula),
-  // ...factory(Heading),
-  // ...factory(List),
-  // ...factory(Quote),
-  // ...factory(Image),
-  // ...factory(caseMatch),
-  // ...factory(lens),
-  // ...factory(useLens),
-  // ...factory(fe),
+  ...factory(caseMatch),
+  ...factory(lens),
+  ...factory(useLens),
+  ...factory(fe),
   ...factory(radar),
 ];

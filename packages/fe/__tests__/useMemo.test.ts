@@ -9,7 +9,7 @@ describe('useMemo test', () => {
       return value;
     });
 
-    const times = Math.floor(Math.random() * 100);
+    const times = Math.floor(Math.random() * 100) + 1;
     const value = run(
       fe(({ trigger }) => () => {
         return Array.from({ length: times })
@@ -49,7 +49,11 @@ describe('useMemo test', () => {
       const value = useMemo('memo', () => Math.random(), dependencies ?? []);
       return value;
     });
-    const parent = fe(({ trigger }) => () => trigger(testCase));
+    const parent = fe(
+      ({ trigger }) =>
+        () =>
+          trigger(testCase),
+    );
 
     const value = run(
       fe(({ trigger }) => () => {
