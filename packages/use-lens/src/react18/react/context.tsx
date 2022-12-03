@@ -8,13 +8,7 @@ export function context<State>(
   initialValue: State,
 ) {
   const store = createStore(middleware, initialValue);
-  let value = Object.assign({}, initialValue);
   const Context = React.createContext(store);
-
-  store.__bind(
-    () => value,
-    (nValue) => (value = nValue),
-  );
 
   const SharedProvider = React.forwardRef<
     {
@@ -24,8 +18,9 @@ export function context<State>(
       value?: State;
       initialValue?: DeepPartial<State>;
       children: React.ReactNode;
+      id?: string;
     }
-  >(({ children, value, initialValue: _initialValue }, ref) => {
+  >(({ children, value, initialValue: _initialValue, id }, ref) => {
     const storeRef = React.useRef<Store<State> | null>(null);
     const [initialState] = React.useState(() =>
       Object.assign({}, initialValue, _initialValue),
@@ -33,18 +28,18 @@ export function context<State>(
 
     if (storeRef.current === null) {
       const v = value || initialState;
-      storeRef.current = createStore(middleware, v);
+      storeRef.current = createStore(middleware, v, id);
     }
     React.useImperativeHandle(ref, () => ({
       getState: () => storeRef.current!.getState(),
     }));
     return (
       <Context.Provider value={storeRef.current}>
-        <StateComponent
+        {/* <StateComponent
           store={storeRef.current}
           value={value}
           initialValue={initialState}
-        ></StateComponent>
+        ></StateComponent> */}
         {children}
       </Context.Provider>
     );
@@ -56,20 +51,20 @@ export function context<State>(
     useStore: () => React.useContext(Context),
   };
 
-  function StateComponent({
-    store,
-    value,
-    initialValue,
-  }: {
-    store: Store<State>;
-    value?: State;
-    initialValue: State;
-  }) {
-    const v = value || initialValue;
-    const [state, setState] = useDerivedValue(v, (nV) =>
-      store.setState(nV, 'change from top component'),
-    );
-    store.__bind(() => state, setState);
-    return null;
-  }
+  // function StateComponent({
+  //   store,
+  //   value,
+  //   initialValue,
+  // }: {
+  //   store: Store<State>;
+  //   value?: State;
+  //   initialValue: State;
+  // }) {
+  //   const v = value || initialValue;
+  //   const [state, setState] = useDerivedValue(v, (nV) =>
+  //     store.setState(nV, 'change from top component'),
+  //   );
+  //   store.__bind(() => state, setState);
+  //   return null;
+  // }
 }

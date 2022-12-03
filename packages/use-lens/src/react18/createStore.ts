@@ -15,32 +15,35 @@ export type Store<State> = {
   dispatchAction: (f: (old: State) => State, message?: string) => void;
   getState: () => State;
   setState: (newState: State, message?: string) => void;
-  __bind: (get: () => State, set: (newState: State) => void) => void;
+  // __bind: (get: () => State, set: (newState: State) => void) => void;
+  id?: string;
 };
 
 export const createStore = <State>(
   middleware: MiddlewareImpl<State>,
   initialState: State,
+  id?: string,
 ): Store<State> => {
   type Listener = () => void;
   type Callback = (old: State) => State;
 
   const listeners = new Set<Listener>();
-  let internalState: State | null = null;
-  let getStateHander: () => State = null as any;
-  let setStateHandler: (newState: State, message?: string) => void =
-    null as any;
+  let internalState: State = initialState;
+  // let getStateHander: () => State = null as any;
+  // let setStateHandler: (newState: State, message?: string) => void =
+  //   null as any;
 
   const store = {
+    id,
     subscribe,
     dispatchAction,
     getState,
     setState,
-    __bind: (get: () => State, set: (newState: State) => void) => {
-      internalState = null;
-      getStateHander = get;
-      setStateHandler = set;
-    },
+    // __bind: (get: () => State, set: (newState: State) => void) => {
+    //   internalState = null;
+    //   getStateHander = get;
+    //   setStateHandler = set;
+    // },
   };
   const { get, set } = middleware(store, initialState);
   return store;
@@ -71,10 +74,14 @@ export const createStore = <State>(
   }
 
   function setState(newState: State, message?: string) {
-    if (setStateHandler) {
-      set((v) => setStateHandler(v))(newState, message);
-      scheduleUpdate();
-    }
+    // if (setStateHandler) {
+    //   set((v) => setStateHandler(v))(newState, message);
+    //   scheduleUpdate();
+    // }
+    set((v) => {
+      internalState = v;
+    })(newState, message);
+    scheduleUpdate();
   }
 
   function scheduleUpdate() {
@@ -86,9 +93,8 @@ export const createStore = <State>(
   }
 
   function getState() {
-    return get(() => {
-      const h = internalState || getStateHander();
-      return h;
-    })();
+    const nV = get(() => internalState!)();
+    internalState = nV;
+    return internalState;
   }
 };

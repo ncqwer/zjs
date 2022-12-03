@@ -1,0 +1,76 @@
+name: Publish
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    # outputs:
+    #   result: ${{ steps.set-result.outputs.result }}
+
+    steps:
+      - name: Install Yarn@v1
+        if: ${{ env.ACT }}
+        run: |
+          npm install --global yarn
+
+      - name: Checkout
+        uses: actions/checkout/@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Nodejs
+        uses: actions/setup-node@v3
+        with:
+          cache: 'yarn'
+          node-version: 16
+
+      - name: Lerna Bootstrap
+        run: |
+          yarn 
+          yarn lerna bootstrap
+
+      - name: Build
+        run: |
+          yarn build
+
+      - name: Test
+        run: |
+          yarn test:ci
+        # uses: actions/github-script@v6
+        # with:
+        #   github-token: ${{ secrets.MY_TEST_TOKEN }}
+        #   # this is just an example, this could be any command that will trigger jest
+        #   script: |
+        #     const fsp = require('fs/promises');
+        #     let content;
+        #     try {
+        #       const options = {
+        #         silent: true
+        #       };
+        #       options.listeners = {
+        #         stdout: (data) => {
+
+        #         },
+        #         stderr: (data) => {
+        #         }
+        #       };
+        #       console.log("start==>");
+        #       await exec.exec("yarn test:ci", [],options);
+        #       console.log('after==>',fsp.readFile,process.cwd());
+        #       content = await fsp.readFile('test.result.json',{encoding: 'utf-8'});
+        #       core.setOutput('result',content);
+        #     } catch (e) {
+        #       console.error("Jest execution failed. Tests have likely failed.", e)
+        #     }
+        #     return content;
+
+  # result:
+  #   runs-on: ubuntu-latest
+  #   needs: test
+  #   steps:
+  #     - name: See Test Result
+  #       run: |
+  #         echo "${{fromJSON(needs.test.outputs.result)}}"

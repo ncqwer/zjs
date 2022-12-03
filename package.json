@@ -64,6 +64,6 @@
     "build:watch": "rollup --watch --config ./config/rollup.config.js",
     "build:release": "cross-env NODE_ENV=production yarn build",
     "pkgcreate": "node scripts/create.js",
-    "test": "node scripts/test.js"
+    "test:ci": "node test.js"
   }
 }
