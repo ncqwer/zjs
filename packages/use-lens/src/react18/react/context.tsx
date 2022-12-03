@@ -18,9 +18,9 @@ export function context<State>(
       value?: State;
       initialValue?: DeepPartial<State>;
       children: React.ReactNode;
-      id?: string;
+      globalId?: string;
     }
-  >(({ children, value, initialValue: _initialValue, id }, ref) => {
+  >(({ children, value, initialValue: _initialValue, globalId }, ref) => {
     const storeRef = React.useRef<Store<State> | null>(null);
     const [initialState] = React.useState(() =>
       Object.assign({}, initialValue, _initialValue),
@@ -28,7 +28,7 @@ export function context<State>(
 
     if (storeRef.current === null) {
       const v = value || initialState;
-      storeRef.current = createStore(middleware, v, id);
+      storeRef.current = createStore(middleware, v, globalId);
     }
     React.useImperativeHandle(ref, () => ({
       getState: () => storeRef.current!.getState(),
