@@ -1,0 +1,39 @@
+{
+  "name": "lint",
+  "version": "1.0.0",
+  "description": "eslint and prettier lint for myself",
+  "keywords": [
+    "lint"
+  ],
+  "author": "“ncqwer” <“18694039767@163.com”>",
+  "license": "MIT",
+  "files": [
+    "eslint.js",
+    "prettier.js",
+    "eslint-react.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ncqwer/zjs.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/ncqwer/zjs/issues"
+  },
+  "homepage": "https://github.com/ncqwer/zjs#readme",
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.35.1",
+    "@typescript-eslint/parser": "^5.35.1",
+    "eslint": "^8.23.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.31.2",
+    "prettier": "^2.7.1"
+  }
+}
