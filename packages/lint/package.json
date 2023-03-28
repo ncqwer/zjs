@@ -1,6 +1,6 @@
 {
-  "name": "lint",
-  "version": "1.0.1",
+  "name": "@zhujianshi/lint",
+  "version": "1.0.2",
   "description": "eslint and prettier lint for myself",
   "keywords": [
     "lint"
@@ -35,5 +35,6 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.2",
     "prettier": "^2.7.1"
-  }
+  },
+  "gitHead": "683d2eed022f27a686fbe5301d19a16a7c1a6981"
 }
