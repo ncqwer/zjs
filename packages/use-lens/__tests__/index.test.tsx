@@ -1,6 +1,12 @@
+/**
+ * @jest-environment jsdom
+ */
+
+/* eslint-disable import/no-extraneous-dependencies */
+
 import React from 'react';
-import { createShared, microBundled, macroBundled } from '../src/index';
-import { renderHook, act } from '@testing-library/react-hooks';
+import { createShared, microBundled } from '../src/index';
+import { renderHook, act } from '@testing-library/react';
 import { to } from '@zhujianshi/lens';
 
 type TestData = {
@@ -28,7 +34,6 @@ describe('useLens', () => {
     useLens,
     SharedProvider,
     useGetting,
-    useSetting,
     // useSetLens,
   } = createShared<TestData>(
     {
@@ -184,7 +189,7 @@ describe('useLens', () => {
   });
 
   test.skip('should work with macroBundled', async () => {
-    setHandler = jest.fn((x, message) => {
+    setHandler = jest.fn((x) => {
       return x;
     });
     const fn = jest.fn(() => {

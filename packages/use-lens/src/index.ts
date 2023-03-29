@@ -1,5 +1,4 @@
 import { createShared } from './react18';
-import { createShared as createShared__old } from './old';
 
 export type DeepPartial<T> = T extends number
   ? number
@@ -14,6 +13,6 @@ export type DeepPartial<T> = T extends number
 export type { SharedApi } from './react18/react/shareApi';
 export type { Middleware } from './react18/';
 
-export { createShared, createShared__old };
+export { createShared };
 
 export { microBundled, macroBundled } from './react18/schedule';

@@ -1,9 +1,20 @@
 {
-  "packages": [
-    "packages/*"
-  ],
-  "version": "independent",
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json",
+  "useNx": true,
   "useWorkspaces": true,
-  "npmClient": "yarn",
-  "esModule":true
+  "version": "independent",
+  "esModule": true,
+  "command": {
+    "publish": {
+      "npmClient": "yarn",
+      "registry": "https://registry.npmjs.org/"
+    },
+    "bootstrap": {
+      "npmClient": "yarn"
+    }
+  },
+  "packages": [
+    "packages/*",
+    "playground"
+  ]
 }

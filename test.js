@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 const fsp = require('fs/promises');
 const child_process = require('child_process');
 

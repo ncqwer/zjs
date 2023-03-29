@@ -7,9 +7,16 @@
   ],
   "author": "“ncqwer” <“18694039767@163.com”>",
   "license": "MIT",
-  "main": "dist/index.js",
-  "module": "dist/index.module.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.mjs",
+  "source": "src/index.ts",
+  "types": "dist/src/index.d.ts",
+  "scripts": {
+    "build:type": "tsc --emitDeclarationOnly",
+    "build:ts": "vite build",
+    "build": "yarn build:ts && yarn build:type",
+    "prepublish": "rm dist/tsconfig.tsbuildinfo"
+  },
   "directories": {
     "lib": "dist",
     "test": "__tests__"
@@ -23,9 +30,6 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ncqwer/zjs.git"
-  },
-  "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "bugs": {
     "url": "https://github.com/ncqwer/zjs/issues"

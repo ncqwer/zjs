@@ -60,7 +60,7 @@ export const hooks = <State,>(
     const store = useStore();
 
     return React.useCallback(
-      (v) => {
+      (v: any) => {
         if (typeof v === 'function') {
           store.dispatchAction(
             (old) => over(targetLens, v, old),
@@ -97,7 +97,7 @@ export const hooks = <State,>(
     return [
       value,
       React.useCallback(
-        (v) => {
+        (v: any) => {
           if (typeof v === 'function') {
             store.dispatchAction(
               (old) => over(targetLens, v, old),
