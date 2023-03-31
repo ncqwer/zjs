@@ -1,6 +1,6 @@
 {
   "name": "@zhujianshi/deploy-helper",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "“ncqwer” <“18694039767@163.com”>",
   "license": "MIT",
   "main": "dist/src/index.js",
