@@ -5,6 +5,8 @@
   "compilerOptions": {
     "outDir": "dist",
     "module": "commonjs",
-    "sourceMap": false
+    "sourceMap": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   }
 }

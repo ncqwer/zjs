@@ -10,7 +10,7 @@ import {
   constants,
   mkdir,
 } from 'fs/promises';
-import prompts from 'prompts';
+import prompts = require('prompts');
 import { getEnvPath } from './getEnvPath';
 
 export function buildConfigCommand() {
@@ -19,15 +19,21 @@ export function buildConfigCommand() {
     .description(
       'init deploy-helper config and store it in ~/.config/deploy-helper/.env',
     )
-    .option('-i, --interactive', '', false)
+    .option('-p, --path', 'output env file path', false)
+    .option('-i, --interactive', 'enter interactive mode to add KV', false)
     .option(
       '--reset <env file>',
       'target directory that includes template files',
       false,
     )
-    .action(async ({ interactive, reset: file }) => {
+    .action(async ({ interactive, reset: file, path: needOuptputPath }) => {
       let configure = {};
       const userEnvFilePath = getEnvPath();
+      if (needOuptputPath) {
+        // eslint-disable-next-line no-console
+        console.log(userEnvFilePath);
+        return;
+      }
       if (!interactive && file) {
         await makesureDirExit();
         await copyFile(resolve(file), userEnvFilePath);
