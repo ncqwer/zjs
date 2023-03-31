@@ -1,5 +1,5 @@
 {
-  "name": "zjs",
+  "name": "zhujianshi",
   "version": "0.0.1",
   "license": "MIT",
   "private": true,
@@ -31,6 +31,7 @@
     "react-test-renderer": "^18.2.0",
     "ts-jest": "^29.0.5",
     "ts-md5": "^1.2.11",
+    "ts-node": "^10.9.1",
     "tslib": "^2.0.0",
     "typescript": "^4.1.5",
     "vite": "^3.0.9",
@@ -40,6 +41,7 @@
     "devadd": "yarn add -D --ignore-workspace-root-check",
     "build": "lerna run build --ignore doc",
     "pkgcreate": "node scripts/create.js",
-    "test:ci": "node test.js"
+    "test:ci": "node test.js",
+    "pkgadd": "node script/create.js"
   }
 }
