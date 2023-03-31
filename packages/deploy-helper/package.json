@@ -4,7 +4,7 @@
   "author": "“ncqwer” <“18694039767@163.com”>",
   "license": "MIT",
   "main": "dist/src/index.js",
-  "bin": "dist/src/bin.js",
+  "bin": "dist/src/cli.js",
   "directories": {
     "lib": "dist",
     "test": "__tests__"
