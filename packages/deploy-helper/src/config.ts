@@ -10,7 +10,7 @@ import {
   constants,
   mkdir,
 } from 'fs/promises';
-import * as prompts from 'prompts';
+import prompts from 'prompts';
 import { getEnvPath } from './getEnvPath';
 
 export function buildConfigCommand() {
@@ -43,7 +43,7 @@ export function buildConfigCommand() {
       if (interactive) {
         let cancelFlag = false;
         while (!cancelFlag) {
-          const { key, value, isContinue } = await (prompts as any)(
+          const { key, value, isContinue } = await prompts(
             [
               {
                 type: 'text',
