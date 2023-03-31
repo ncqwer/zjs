@@ -3,7 +3,7 @@ import { parse } from 'dotenv';
 import { Command, InvalidArgumentError } from 'commander';
 import { resolve, extname } from 'path';
 import { readFile, writeFile, readdir } from 'fs/promises';
-import * as getPort from 'get-port';
+import getPort = require('get-port');
 import { getEnvPath } from './getEnvPath';
 
 const FILECONTENTREG = /\$\$(\S+?)\$\$/g;
