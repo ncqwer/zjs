@@ -20,6 +20,7 @@ export function buildReplaceCommand() {
       'target directory that includes template files',
       '.',
     )
+    .option('-r, --recursive', 'recuresive handle directory', false)
     .option(
       '--port',
       'attempt to query an available port number and inject it into a variable',
@@ -42,7 +43,15 @@ export function buildReplaceCommand() {
       {} as Record<string, string>,
     )
     .action(
-      async ({ dir, configure: _configure, ext, exclude, port, debug }) => {
+      async ({
+        dir,
+        configure: _configure,
+        ext,
+        exclude,
+        port,
+        debug,
+        recursive,
+      }) => {
         // return;
         const extReg = new RegExp(ext);
         const excludeReg = new RegExp(exclude);
@@ -82,7 +91,7 @@ export function buildReplaceCommand() {
             dirs.map((dir) => {
               const path = resolve(dirPath, dir.name);
               if (excludeReg.test(path)) return;
-              if (dir.isDirectory()) return replaceDir(path);
+              if (recursive && dir.isDirectory()) return replaceDir(path);
               if (dir.isFile()) return replaceFileContent(path);
             }),
           );
