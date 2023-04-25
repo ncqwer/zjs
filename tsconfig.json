@@ -1,9 +1,10 @@
 {
-  "files": [],
+  "extends": "./config/tsconfig.base.json",
   "references": [
     { "path": "./packages/case-match" },
     { "path": "./packages/lens" },
     { "path": "./packages/use-lens" },
-    { "path": "./packages/deploy-helper" }
+    { "path": "./packages/deploy-helper" },
+    { "path": "./packages/chat" }
   ]
 }

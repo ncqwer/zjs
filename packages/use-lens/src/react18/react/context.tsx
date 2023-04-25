@@ -1,7 +1,6 @@
 import React from 'react';
 import { DeepPartial } from '../..';
 import { MiddlewareImpl, createStore, Store } from '../createStore';
-import { useDerivedValue } from '../utils/useDerivedValue';
 
 export function context<State>(
   middleware: MiddlewareImpl<State>,

@@ -1,0 +1,42 @@
+{
+  "name": "@zhujianshi/chat",
+  "version": "1.0.0",
+  "author": "“ncqwer” <“18694039767@163.com”>",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.mjs",
+  "directories": {
+    "lib": "dist",
+    "test": "__tests__"
+  },
+  "files": [
+    "dist",
+    "style"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ncqwer/zjs.git"
+  },
+  "scripts": {
+    "build:type": "tsc --emitDeclarationOnly",
+    "build:ts": "vite build",
+    "build": "yarn build:ts && yarn build:type",
+    "prepublish": "rm dist/tsconfig.tsbuildinfo"
+  },
+  "bugs": {
+    "url": "https://github.com/ncqwer/zjs/issues"
+  },
+  "homepage": "https://github.com/ncqwer/zjs#readme",
+  "source": "src/index.ts",
+  "types": "dist/src/index.d.ts",
+  "dependencies": {
+    "chromadb": "^1.4.1",
+    "eventsource-parser": "^1.0.0",
+    "langchain": "^0.0.63",
+    "uuid": "^9.0.0"
+  }
+}
