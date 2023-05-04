@@ -1,5 +1,6 @@
 {
   "name": "@zhujianshi/chat",
+  "private": true,
   "version": "1.0.0",
   "author": "“ncqwer” <“18694039767@163.com”>",
   "license": "MIT",

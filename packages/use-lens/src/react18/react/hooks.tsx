@@ -43,7 +43,7 @@ export const hooks = <State,>(
     return useSyncExternalStoreWithSelector(
       store.subscribe,
       store.getState,
-      null,
+      store.getState,
       (v) => view(targetLens, v),
       isEqual,
     );
@@ -89,7 +89,7 @@ export const hooks = <State,>(
     const value = useSyncExternalStoreWithSelector(
       store.subscribe,
       store.getState,
-      null,
+      store.getState,
       (v) => view(targetLens, v),
       isEqual,
     );

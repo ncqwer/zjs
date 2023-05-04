@@ -1,7 +1,7 @@
 import { ConversationChain } from 'langchain/chains';
 // import { BufferMemory } from 'langchain/memory';
-// import { GLM } from './llm/glm.ts';
-import { OpenAIChatProxy } from './llm/openai_chat_proxy.ts';
+import { GLM } from './llm/glm.ts';
+// import { OpenAIChatProxy } from './llm/openai_chat_proxy.ts';
 // import { EncoderFakeEmbeddings } from './embeddings/encoder_fake.ts';
 import { ChromaMemory } from './memory/chroma_memory.ts';
 import { ChromaClient } from 'chromadb';
@@ -10,6 +10,7 @@ import { v4 as uuid } from 'uuid';
 import * as readline from 'readline/promises';
 import { stdin as input, stdout as output } from 'process';
 import { OpenAIProxyEmbeddings } from './embeddings/openai_proxy_embeddings.ts';
+import { handleSSE } from './llm/openai_chat_proxy.ts';
 
 const mockQACache = () => {
   const cache = {};
@@ -37,13 +38,13 @@ const mockQACache = () => {
   }
 };
 
-const main = async () => {
-  // const model = new GLM({ url: 'http://workspace.izhaji.cloud:8000' });
-  const model = new OpenAIChatProxy({
-    proxy_url: '',
-    openAIApiKey: '',
-    streaming: true,
-  });
+export const main1 = async () => {
+  const model = new GLM({ url: 'http://workspace.izhaji.cloud:8000' });
+  // const model = new OpenAIChatProxy({
+  //   proxy_url: '',
+  //   openAIApiKey: '',
+  //   streaming: true,
+  // });
   // const embeddings = new EncoderFakeEmbeddings({ modelName: 'gpt-3.5-turbo' });
   const embeddings = new OpenAIProxyEmbeddings({
     proxy_url: '',
@@ -72,10 +73,10 @@ const main = async () => {
     embeddings,
     collection,
   });
-  // console.log(memory.n);
+  console.log(memory.n);
   const chain = new ConversationChain({
     outputKey: 'output',
-    memory,
+    // memory:,
     llm: model,
   });
   try {
@@ -87,6 +88,24 @@ const main = async () => {
   } finally {
     // embeddings.free();
   }
+};
+
+const main = async () => {
+  const response = await fetch('http://localhost:7001/generate', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'c3f8ea47-5806-4c4d-b0a5-5195b8f06028',
+    },
+    body: JSON.stringify({
+      stream: true,
+      // refreshToken: '0c094c1b-faee-45a7-8097-eb5f36c0e0d1',
+    }),
+  });
+  handleSSE(response, (event) => {
+    console.log(event);
+  });
+  // console.log(await response.json());
 };
 
 main().catch((e) => console.error(e));

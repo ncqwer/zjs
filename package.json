@@ -40,7 +40,7 @@
   },
   "scripts": {
     "devadd": "yarn add -D --ignore-workspace-root-check",
-    "build": "lerna run build --ignore doc",
+    "build": "lerna run build --ignore doc --ignore @zhujianshi/chat",
     "pkgcreate": "node scripts/create.js",
     "test:ci": "node test.js",
     "pkgadd": "node script/create.js",
