@@ -1,6 +1,6 @@
 {
   "name": "@zhujianshi/git-proxy",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Git proxy for A -> B -> upstream with gate/hooks",
   "type": "module",
   "bin": {
