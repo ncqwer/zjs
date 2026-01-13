@@ -1,0 +1,24 @@
+{
+  "name": "@zhujianshi/git-proxy",
+  "version": "0.1.0",
+  "description": "Git proxy for A -> B -> upstream with gate/hooks",
+  "type": "module",
+  "bin": {
+    "zjs-git-proxy": "./git-proxy.cjs"
+  },
+  "exports": {
+    ".": {
+      "import": "./git-proxy.js",
+      "require": "./git-proxy.cjs"
+    }
+  },
+  "files": [
+    "git-proxy.js",
+    "git-proxy.cjs",
+    "templates/",
+    "READMD.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROXY_BASE="__PROXY_BASE_ABS__"
+UPSTREAM="upstream"
+
+log(){ echo "proxy: $*" >&2; }
+ts(){ date +"%Y-%m-%d %H:%M:%S"; }
+
+ORIG="${SSH_ORIGINAL_COMMAND:-}"
+if [[ -z "$ORIG" ]]; then
+  log "denied: no SSH_ORIGINAL_COMMAND"
+  exit 1
+fi
+log "request: $(ts) cmd='$ORIG' from='${SSH_CONNECTION:-unknown}'"
+
+case "$ORIG" in
+  git-upload-pack*) cmd="git-upload-pack" ;;
+  git-receive-pack*) cmd="git-receive-pack" ;;
+  *) log "denied: unsupported command: $ORIG"; exit 1 ;;
+esac
+
+repo_path="$(printf "%s" "$ORIG" \
+  | sed -E "s/^git-(upload|receive)-pack[[:space:]]+//" \
+  | tr -d "'" | tr -d '"')"
+
+resolve_path() {
+  local p="$1"
+  local d
+  d="$(cd "$(dirname "$p")" 2>/dev/null && pwd -P)" || return 1
+  printf "%s/%s" "$d" "$(basename "$p")"
+}
+
+repo_path_resolved="$(resolve_path "$repo_path" || true)"
+proxy_base_resolved="$(resolve_path "$PROXY_BASE" || true)"
+
+repo_path_check="$repo_path"
+proxy_base_check="$PROXY_BASE"
+if [[ -n "$repo_path_resolved" && -n "$proxy_base_resolved" ]]; then
+  repo_path_check="$repo_path_resolved"
+  proxy_base_check="$proxy_base_resolved"
+fi
+
+case "$repo_path_check" in
+  "$proxy_base_check"/*/.git) ;;
+  *) log "denied: repo not allowed: $repo_path"; exit 1 ;;
+esac
+
+REPO_DIR="$repo_path"
+LOCK_DIR="$REPO_DIR/.proxy-sync.lock"
+LOCK_META="$LOCK_DIR/owner"
+write_lock_meta() {
+  cat > "$LOCK_META" <<EOF
+pid=$$
+time=$(date +%s)
+repo=$REPO_DIR
+cmd=$cmd
+orig=$ORIG
+EOF
+}
+
+read_lock_meta() {
+  if [[ -f "$LOCK_META" ]]; then
+    tr '\n' ' ' < "$LOCK_META" 2>/dev/null || true
+  fi
+}
+
+acquire_lock() {
+  if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+    log "lock exists for $REPO_DIR; reject request. holder: $(read_lock_meta)"
+    exit 1
+  fi
+  write_lock_meta
+}
+release_lock(){
+  rm -f "$LOCK_META" 2>/dev/null || true
+  rmdir "$LOCK_DIR" 2>/dev/null || true
+}
+
+if [[ "$cmd" == "git-upload-pack" ]]; then
+  acquire_lock
+  trap release_lock EXIT INT TERM
+
+  # If a ref file blocks the remote-tracking namespace, move it aside for safety.
+  if [[ -f "$REPO_DIR/refs/remotes/upstream" ]]; then
+    ts="$(date +%s)"
+    mv "$REPO_DIR/refs/remotes/upstream" "$REPO_DIR/refs/remotes/upstream.bak.$ts"
+    log "ref collision: moved refs/remotes/upstream to backup"
+  fi
+
+  log "sync upstream for $REPO_DIR"
+  out="$(git --git-dir="$REPO_DIR" fetch --prune "$UPSTREAM" \
+    '+refs/heads/*:refs/heads/*' '+refs/tags/*:refs/tags/*' 2>&1)" || {
+    log "fetch failed: $out"
+    exit 1
+  }
+  local_main="$(git --git-dir="$REPO_DIR" rev-parse --short refs/heads/main 2>/dev/null || true)"
+  upstream_main="$(git --git-dir="$REPO_DIR" ls-remote --heads "$UPSTREAM" main | awk '{print $1}' || true)"
+  log "sync ok; local main=${local_main:-none} upstream main=${upstream_main:-none}"
+fi
+
+if [[ "$cmd" == "git-upload-pack" ]]; then
+  "$cmd" "$repo_path"
+  status=$?
+  release_lock
+  exit "$status"
+fi
+
+exec "$cmd" "$repo_path"

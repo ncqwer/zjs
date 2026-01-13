@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+UPSTREAM="upstream"
+zero='0000000000000000000000000000000000000000'
+
+log() { echo "proxy: $*" >&2; }
+
+ALLOW_REF_REGEX='^refs/(heads|tags)/'
+
+branch_specs=()
+tag_specs=()
+
+fix_ref_path_conflict() {
+  local ref="$1"
+  local rel="${ref#refs/}"
+  local prefix=""
+  IFS='/' read -r -a parts <<< "$rel"
+  for ((i=0; i<${#parts[@]}-1; i+=1)); do
+    prefix+="/${parts[$i]}"
+    local p="$REPO_DIR/refs$prefix"
+    local refname="refs${prefix}"
+    if git --git-dir="$REPO_DIR" show-ref --verify --quiet "$refname"; then
+      git --git-dir="$REPO_DIR" update-ref -d "$refname" || true
+      log "ref path conflict: deleted packed ref $refname"
+    fi
+    if [[ -f "$p" ]]; then
+      local ts
+      ts="$(date +%s)"
+      mv "$p" "$p.bak.$ts"
+      log "ref path conflict: moved $p to $p.bak.$ts"
+    fi
+  done
+}
+
+while read -r old new ref; do
+  if [[ ! "$ref" =~ $ALLOW_REF_REGEX ]]; then
+    log "reject ref '$ref' (only refs/heads/* and refs/tags/* allowed)"
+    exit 1
+  fi
+
+  # 删除 ref（分支/tag）: 弱一致 -> 交给 post-receive 处理
+  if [[ "$new" == "$zero" ]]; then
+    continue
+  fi
+
+  # 分支：强制 fast-forward（仅通过 ls-remote 读取 upstream tip）
+  if [[ "$ref" == refs/heads/* ]]; then
+    branch="${ref#refs/heads/}"
+    fix_ref_path_conflict "$ref"
+
+    upstream_tip="$(git --git-dir="$REPO_DIR" ls-remote --heads "$UPSTREAM" "$branch" | awk '{print $1}' || true)"
+
+    if [[ -n "$upstream_tip" ]]; then
+      # 要求 upstream_tip 是 new 的祖先，否则 non-ff
+      if ! git --git-dir="$REPO_DIR" merge-base --is-ancestor "$upstream_tip" "$new" >/dev/null 2>&1; then
+        log "reject non-fast-forward push to '$branch' (upstream moved)"
+        log "upstream tip: $upstream_tip"
+        log "your new tip: $new"
+        exit 1
+      fi
+    else
+      log "creating new branch '$branch' on upstream"
+    fi
+
+    branch_specs+=("${new}:${ref}")
+    continue
+  fi
+
+  # tag：不做 ff 校验，交给 upstream 策略
+  fix_ref_path_conflict "$ref"
+  tag_specs+=("${new}:${ref}")
+done
+
+# 先推 upstream 成功才接收（强一致）
+if ((${#branch_specs[@]})); then
+  if ! out="$(git --git-dir="$REPO_DIR" push --porcelain --atomic "$UPSTREAM" "${branch_specs[@]}" 2>&1)"; then
+    log "upstream branch push failed"
+    log "$out"
+    exit 1
+  fi
+fi
+
+if ((${#tag_specs[@]})); then
+  if ! out="$(git --git-dir="$REPO_DIR" push --porcelain --atomic "$UPSTREAM" "${tag_specs[@]}" 2>&1)"; then
+    log "upstream tag push failed"
+    log "$out"
+    exit 1
+  fi
+fi
+
+log "pre-receive ok; accepting."
+exit 0

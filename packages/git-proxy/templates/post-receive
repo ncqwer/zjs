@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+UPSTREAM="upstream"
+zero='0000000000000000000000000000000000000000'
+
+log() { echo "proxy: $*" >&2; }
+
+branch_specs=()
+tag_specs=()
+
+while read -r old new ref; do
+  case "$ref" in
+    refs/heads/*)
+      if [[ "$new" == "$zero" ]]; then
+        branch_specs+=(":${ref}")
+      fi
+      ;;
+    refs/tags/*)
+      if [[ "$new" == "$zero" ]]; then
+        tag_specs+=(":${ref}")
+      fi
+      ;;
+  esac
+done
+
+if ((${#branch_specs[@]})); then
+  if ! out="$(git --git-dir="$REPO_DIR" push --porcelain --atomic "$UPSTREAM" "${branch_specs[@]}" 2>&1)"; then
+    log "upstream branch push failed"
+    log "$out"
+  else
+    log "upstream branch push ok"
+  fi
+fi
+
+if ((${#tag_specs[@]})); then
+  if ! out="$(git --git-dir="$REPO_DIR" push --porcelain --atomic "$UPSTREAM" "${tag_specs[@]}" 2>&1)"; then
+    log "upstream tag push failed"
+    log "$out"
+  else
+    log "upstream tag push ok"
+  fi
+fi
+
+exit 0
